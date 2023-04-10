@@ -11,7 +11,7 @@ import os
 
 import dotenv
 
-import client
+import client as client
 
 
 def main():
@@ -21,7 +21,6 @@ def main():
     # Create and configure logger.
     logger = logging.getLogger(__name__)
     logging.basicConfig(filename="lilith.log", filemode="w", level=logging.INFO)
-    
 
     # Create and run client object.
     lilith_client = client.LILITHClient(os.environ['OWNER_IDS'])
