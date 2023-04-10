@@ -63,9 +63,14 @@ class LILITHClient(discord.Client):
                         if not isinstance(channel, discord.TextChannel):
                             continue
 
-                        async for m in channel.history(limit=None):
-                            if str(m.author.id) in self.owner_ids:
-                                self.ai.save_data(m.content)
+                        self.logger.info(f'Loading channel {channel}.')
+
+                        try:
+                            async for m in channel.history(limit=None):
+                                if str(m.author.id) in self.owner_ids:
+                                    self.ai.save_data(m.content)
+                        except discord.errors.Forbidden:
+                            self.logger.info(f'Unable to view {channel}')
                     
                     self.ai.load_data()
                     await message.channel.send('Data loaded.')
@@ -78,7 +83,8 @@ class LILITHClient(discord.Client):
                 self.ai.save_data(message.content)
                 self.ai.load_data()
         
-        if message.guild is None or self.user.mention in message.content:
+        if (self.user.mention in message.content
+            or message.guild is None and message.author is not self.user):
             # Otherwise, if the message is addressed to L.I.L.I.T.H. or in a PM, respond.
             sentence = self.ai.get_sentence(self.response_length)
             await message.channel.send(sentence)
