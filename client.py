@@ -49,7 +49,7 @@ class LILITHClient(discord.Client):
         self.logger.info('Bot ready.')
     
     async def on_message(self, message: discord.Message):
-        if message.author in self.owner_ids:
+        if str(message.author.id) in self.owner_ids:
             # If the message comes from an owner, save it.
             if message.content.startswith(self.prefix):
                 # If the message is a command, run it.
@@ -59,9 +59,12 @@ class LILITHClient(discord.Client):
                     # Load all the data in this guild.
                     await message.channel.send('Loading guild. This could take a while.')
 
-                    for channel in message.guild:
-                        for m in channel.history(limit=None):
-                            if m.author.id in self.owner_ids:
+                    for channel in message.guild.channels:
+                        if not isinstance(channel, discord.TextChannel):
+                            continue
+
+                        async for m in channel.history(limit=None):
+                            if str(m.author.id) in self.owner_ids:
                                 self.ai.save_data(m.content)
                     
                     self.ai.load_data()
@@ -75,7 +78,7 @@ class LILITHClient(discord.Client):
                 self.ai.save_data(message.content)
                 self.ai.load_data()
         
-        elif message.guild is None or self.user.mention in message.content:
+        if message.guild is None or self.user.mention in message.content:
             # Otherwise, if the message is addressed to L.I.L.I.T.H. or in a PM, respond.
             sentence = self.ai.get_sentence(self.response_length)
             await message.channel.send(sentence)

@@ -1,6 +1,8 @@
 """L.I.L.I.T.H.'s brain."""
 
 
+import logging
+
 import markovify
 
 
@@ -14,9 +16,11 @@ class AI:
         dataset_filepath: str - the filepath to the dataset to train on.
         """
         
+        # Create logger.
+        self.logger = logging.getLogger('LILITH.ai')
+
         # Store the dataset filepath.
         self.dataset_filepath = dataset_filepath
-
         # Load the data.
         self.load_data()
 
@@ -24,10 +28,17 @@ class AI:
         """Load the data from the dataset and compile the model."""
 
         # Read the dataset file.
-        with open(self.dataset_filepath) as dataset_file:
-            # Create the model.
-            self.model = markovify.NewlineText(dataset_file.read())
-            self.model.compile(inplace=True)
+        with open(self.dataset_filepath, encoding='utf8') as dataset_file:
+            data = dataset_file.read()
+
+        if data == '':
+            # Whoops, someone forgot their training data.
+            self.logger.critical('No training data.')
+            raise ValueError
+
+        # Create the model.
+        self.model = markovify.NewlineText(data)
+        self.model.compile(inplace=True)
     
     def save_data(self, sentence: str):
         """Save another sentence to the dataset.
@@ -39,9 +50,9 @@ class AI:
         """
 
         # Open the dataset file.
-        with open(self.dataset_filepath, 'a') as dataset_file:
+        with open(self.dataset_filepath, 'a', encoding='utf8') as dataset_file:
             # Append the sentence.
-            dataset_file.write(sentence)
+            dataset_file.write(sentence + '\n')
 
     def get_sentence(self, length: int = 128):
         """Generate a sentence.
