@@ -23,7 +23,7 @@ def main():
     logging.basicConfig(filename="lilith.log", filemode="w", level=logging.INFO)
 
     # Create and run client object.
-    lilith_client = client.LILITHClient(os.environ['OWNER_IDS'])
+    lilith_client = client.LILITHClient(os.environ['OWNER_IDS'], os.environ['DATASET_PATH'])
     lilith_client.run(os.environ['TOKEN'], log_handler=None)
 
 
