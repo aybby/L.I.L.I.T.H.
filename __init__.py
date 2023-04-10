@@ -6,6 +6,7 @@ __author__ = 'Lily Alexander'
 __version__ = '0.1.0'
 
 
+import logging
 import os
 
 import dotenv
@@ -17,9 +18,14 @@ def main():
     # Load .env file.
     dotenv.load_dotenv()
 
+    # Create and configure logger.
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(filename="lilith.log", filemode="w", level=logging.INFO)
+    
+
     # Create and run client object.
-    client = client.LILITHClient()
-    client.run(os.environ['TOKEN'])
+    lilith_client = client.LILITHClient(os.environ['OWNER_IDS'])
+    lilith_client.run(os.environ['TOKEN'], log_handler=None)
 
 
 # If running as main module, run main function.
